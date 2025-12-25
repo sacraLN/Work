@@ -2,12 +2,13 @@
 #include <vector>
 #include <chrono>
 #include <iomanip>
-#include <random>
 #include <algorithm>
+#include <cstdlib>
+
 using namespace std;
 using namespace chrono;
 
-//—Œ–“»–Œ¬ ¿ ¬€¡Œ–ŒÃ
+// –°–æ—Ä—Ç–∏—Ä–æ–≤–∫–∞ –≤—ã–±–æ—Ä–æ–º
 void selectionSort(vector<int>& arr) {
     int n = arr.size();
     for (int i = 0; i < n - 1; ++i) {
@@ -23,10 +24,11 @@ void selectionSort(vector<int>& arr) {
     }
 }
 
-//¡€—“–¿ﬂ —Œ–“»–Œ¬ ¿ 
+// –†–∞–∑–¥–µ–ª–µ–Ω–∏–µ –º–∞—Å—Å–∏–≤–∞
 int partition(vector<int>& arr, int low, int high) {
     int pivot = arr[high];
     int i = low - 1;
+
     for (int j = low; j < high; ++j) {
         if (arr[j] <= pivot) {
             ++i;
@@ -39,76 +41,84 @@ int partition(vector<int>& arr, int low, int high) {
 
 void quickSortHelper(vector<int>& arr, int low, int high) {
     if (low < high) {
-        int pi = partition(arr, low, high);
-        quickSortHelper(arr, low, pi - 1);
-        quickSortHelper(arr, pi + 1, high);
+        int p = partition(arr, low, high);
+        quickSortHelper(arr, low, p - 1);
+        quickSortHelper(arr, p + 1, high);
     }
 }
 
+// –ë—ã—Å—Ç—Ä–∞—è —Å–æ—Ä—Ç–∏—Ä–æ–≤–∫–∞
 void quickSort(vector<int>& arr) {
     if (!arr.empty()) {
         quickSortHelper(arr, 0, arr.size() - 1);
     }
 }
 
-//¬–≈Ãﬂ
-double measureTime(void(*sortFunc)(vector<int>&), vector<int> data) {
+// –ó–∞–º–µ—Ä –≤—Ä–µ–º–µ–Ω–∏
+double timeSort(void (*sortFunc)(vector<int>&), vector<int> arr) {
     auto start = high_resolution_clock::now();
-    sortFunc(data);
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    return duration.count() / 1000.0;
+    sortFunc(arr);
+    auto end = high_resolution_clock::now();
+    return duration_cast<microseconds>(end - start).count() / 1000.0;
+}
+
+void run(int size) {
+    vector<int> a(size), b(size);
+
+    // —Å–ª—É—á–∞–π–Ω—ã–π –º–∞—Å—Å–∏–≤
+    for (int i = 0; i < size; ++i) {
+        a[i] = rand() % 10000;
+        b[i] = a[i];
+    }
+
+    // –ø–æ–ª–Ω–æ—Å—Ç—å—é –æ—Ç—Å–æ—Ä—Ç–∏—Ä–æ–≤–∞–Ω–Ω—ã–π –º–∞—Å—Å–∏–≤
+    /*
+    for (int i = 0; i < size; ++i) {
+        a[i] = i;
+        b[i] = i;
+    }
+    */
+
+    // –Ω–µ–æ—Ç—Å–æ—Ä—Ç–∏—Ä–æ–≤–∞–Ω–Ω—ã–π –º–∞—Å—Å–∏–≤
+    /*
+    for (int i = 0; i < size; ++i) {
+        a[i] = size - i;
+        b[i] = size - i;
+    }
+    */
+
+    // —á–∞—Å—Ç–∏—á–Ω–æ –æ—Ç—Å–æ—Ä—Ç–∏—Ä–æ–≤–∞–Ω–Ω—ã–π –º–∞—Å—Å–∏–≤ (50%)
+    /*
+    for (int i = 0; i < size; ++i) {
+        a[i] = i;
+        b[i] = i;
+    }
+    for (int i = 0; i < size / 2; ++i) {
+        int x = rand() % size;
+        int y = rand() % size;
+        swap(a[x], a[y]);
+        swap(b[x], b[y]);
+    }
+    */
+
+    double tSel = timeSort(selectionSort, a);
+    double tQuick = timeSort(quickSort, b);
+
+    cout << setw(19) << tSel
+        << "    " << setw(15) << tQuick << endl;
 }
 
 int main() {
-    mt19937 gen(random_device{}());
-    uniform_int_distribution<> dis(1, 10000);
+    srand(time(nullptr));
 
-    vector<int> sizes = { 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000 };
+    int sizes[] = { 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000 };
 
     cout << fixed << setprecision(3);
+    cout << "Selection Sort (ms)    Quicksort (ms)" << endl;
+    cout << "-------------------    ---------------" << endl;
 
-    cout << "Selection Sort (ms)    Quicksort (ms)\n";
-    cout << "-------------------    ---------------\n";
-
-    for (int size : sizes) {
-        vector<int> data1(size);
-        vector<int> data2(size);
-
-        //—ÎÛ˜‡ÈÌ˚È Ï‡ÒÒË‚
-        for (int i = 0; i < size; ++i) {
-            data1[i] = dis(gen);
-            data2[i] = dis(gen);
-        }
-
-        //œÓÎÌÓÒÚ¸˛ ÓÚÒÓÚËÓ‚‡ÌÌ˚È Ï‡ÒÒË‚
-        // for (int i = 0; i < size; ++i) {
-        //     data1[i] = i;
-        //     data2[i] = i;
-        // }
-
-        //ÕÂÓÚÒÓÚËÓ‚‡ÌÌ˚È Ï‡ÒÒË‚ 
-        // for (int i = 0; i < size; ++i) {
-        //     data1[i] = size - i;
-        //     data2[i] = size - i;
-        // }
-
-        //◊‡ÒÚË˜ÌÓ ÓÚÒÓÚËÓ‚‡ÌÌ˚È Ï‡ÒÒË‚
-        // for (int i = 0; i < size; ++i) {
-        //     data1[i] = i;
-        //     data2[i] = i;
-        // }
-        // for (int i = 0; i < size / 2; ++i) {
-        //     int idx1 = dis(gen) % size;
-        //     int idx2 = dis(gen) % size;
-        //     swap(data1[idx1], data1[idx2]);
-        //     swap(data2[idx1], data2[idx2]);
-        // }
-
-        double time1 = measureTime(selectionSort, data1);
-        double time2 = measureTime(quickSort, data2);
-
-        cout << setw(19) << time1 << "    " << setw(15) << time2 << "\n";
+    for (int n : sizes) {
+        run(n);
     }
 
     return 0;
