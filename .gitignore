@@ -1,0 +1,28 @@
+# Compiled files
+*.exe
+*.obj
+*.o
+*.out
+
+# Visual Studio
+.vs/
+x64/
+x86/
+Debug/
+Release/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.suo
+*.user
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+
+# Windows
+Thumbs.db
+Desktop.ini
